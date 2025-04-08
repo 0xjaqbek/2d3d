@@ -246,12 +246,13 @@ const renderElevationView = async (pixels, elevationMap, width, height, backgrou
   const elevationWidth = width + PADDING * 2;
   const elevationHeight = height + PADDING * 2;
   
-  // Create canvas for rendering the elevation view with transparency
+  // Create canvas for rendering the elevation view with white background
   const canvas = createCanvas(elevationWidth, elevationHeight);
   const ctx = canvas.getContext('2d');
   
-  // Clear the canvas with transparent background
-  ctx.clearRect(0, 0, elevationWidth, elevationHeight);
+  // Fill the canvas with white background instead of transparent
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fillRect(0, 0, elevationWidth, elevationHeight);
   
   // Calculate the projection factors
   const xProjection = Math.cos(SIDE_VIEW_ANGLE * Math.PI / 180);
@@ -374,7 +375,7 @@ const renderElevationView = async (pixels, elevationMap, width, height, backgrou
     }
     
     // 2. Add NFT ID to top right corner
-    const fontSize = Math.round(elevationHeight * 0.03); // 4% of height for text size
+    const fontSize = Math.round(elevationHeight * 0.03); // 3% of height for text size
     ctx.font = `${fontSize}px sans-serif`;
     ctx.fillStyle = 'black';
     ctx.textAlign = 'right';
@@ -400,7 +401,7 @@ const renderElevationView = async (pixels, elevationMap, width, height, backgrou
     }
     
     ctx.textAlign = 'center';
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = 'white'; // Change text color to black for better visibility on white background
     ctx.textBaseline = 'bottom';
     console.log('Adding owner address:', displayAddress);
     ctx.fillText(`${displayAddress}`, elevationWidth / 2, elevationHeight - 20);
