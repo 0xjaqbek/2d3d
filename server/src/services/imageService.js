@@ -1,10 +1,11 @@
 // server/src/services/imageService.js
 const getPixels = require('get-pixels');
 const { promisify } = require('util');
-const { createCanvas } = require('canvas');
+const { createCanvas, loadImage } = require('canvas');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { ethers } = require('ethers');
 
 // Promisify the get-pixels function
 const getPixelsAsync = promisify((src, type, cb) => getPixels(src, type, cb));
@@ -31,7 +32,10 @@ const FOCUS_END_X = 0.66;     // End of focus region X (percentage of width)
 const FOCUS_START_Y = 0.40;   // Start of focus region Y (percentage of height)
 const FOCUS_END_Y = 0.80;     // End of focus region Y (percentage of height)
 
-const processImage = async (buffer) => {
+// Ethereum provider for ENS lookups
+const ETHEREUM_PROVIDER = new ethers.providers.JsonRpcProvider('https://eth-mainnet.g.alchemy.com/v2/uH88xD8x-hsIQlZ8bgpyWjBfny9WUCfw');
+
+const processImage = async (buffer, tokenId = '0', ownerAddress = '0x0000000000000000000000000000000000000000') => {
   try {
     // Create a temporary file to handle the image processing
     const tempDir = os.tmpdir();
@@ -57,7 +61,7 @@ const processImage = async (buffer) => {
     const elevationMap = createTieredElevationMap(pixels, width, height, backgroundColors);
     
     // Render the elevation view
-    const imageBuffer = renderElevationView(pixels, elevationMap, width, height, backgroundColors);
+    const imageBuffer = await renderElevationView(pixels, elevationMap, width, height, backgroundColors, tokenId, ownerAddress);
     
     return {
       format: 'png',
@@ -200,7 +204,43 @@ const createTieredElevationMap = (pixels, width, height, backgroundColors) => {
   return elevationMap;
 };
 
-const renderElevationView = (pixels, elevationMap, width, height, backgroundColors) => {
+// Helper function to get ENS name for an address
+async function getEnsName(address) {
+  try {
+    const ensName = await ETHEREUM_PROVIDER.lookupAddress(address);
+    return ensName || address;
+  } catch (error) {
+    console.error('Error looking up ENS name:', error);
+    return address;
+  }
+}
+
+// Function to find the logo file
+const findLogoFile = () => {
+  // Try multiple possible locations for the logo file
+  const possiblePaths = [
+    path.join(__dirname, '../../../thePolacyLogo.png'),  // Original path (three levels up)
+    path.join(__dirname, '../../thePolacyLogo.png'),     // Two levels up
+    path.join(__dirname, '../thePolacyLogo.png'),        // One level up
+    path.join(__dirname, 'thePolacyLogo.png'),           // Same directory
+    path.join(process.cwd(), 'thePolacyLogo.png'),       // Root of the project
+    path.join(process.cwd(), 'server/thePolacyLogo.png') // In server directory
+  ];
+
+  // Try to find the first path that exists
+  for (const logoPath of possiblePaths) {
+    console.log('Checking logo path:', logoPath);
+    if (fs.existsSync(logoPath)) {
+      console.log('Logo found at:', logoPath);
+      return logoPath;
+    }
+  }
+
+  console.error('Logo file not found in any of the expected locations');
+  return null;
+};
+
+const renderElevationView = async (pixels, elevationMap, width, height, backgroundColors, tokenId, ownerAddress) => {
   // Calculate the new dimensions for the elevation view
   // We need extra space for the extrusion on both sides
   const elevationWidth = width + PADDING * 2;
@@ -314,6 +354,65 @@ const renderElevationView = (pixels, elevationMap, width, height, backgroundColo
       ctx.closePath();
       ctx.fill();
     }
+  }
+  
+  // Add overlay elements (logo, NFT ID, owner address)
+  try {
+    // 1. Add logo in top left corner
+    const logoPath = findLogoFile();
+    if (logoPath) {
+      try {
+        const logo = await loadImage(logoPath);
+        // Calculate logo dimensions (keeping aspect ratio, 10% of canvas height)
+        const logoHeight = Math.round(elevationHeight * 0.1);
+        const logoWidth = Math.round((logo.width / logo.height) * logoHeight);
+        ctx.drawImage(logo, 20, 20, logoWidth, logoHeight);
+        console.log('Logo successfully added to the image');
+      } catch (logoError) {
+        console.error('Error loading logo image:', logoError);
+      }
+    }
+    
+    // 2. Add NFT ID to top right corner
+    const fontSize = Math.round(elevationHeight * 0.06); // 4% of height for text size
+    ctx.font = `${fontSize}px sans-serif`;
+    ctx.fillStyle = 'black';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'top';
+    
+    // Add shadow to make text more visible
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.7)';
+    ctx.shadowBlur = 5;
+    ctx.shadowOffsetX = 1;
+    ctx.shadowOffsetY = 1;
+    
+    // Draw NFT ID
+    console.log('Adding NFT ID:', tokenId);
+    ctx.fillText(`#${tokenId}`, elevationWidth - 20, 20);
+    
+    // 3. Add owner address/ENS at the bottom
+    // Look up ENS name if available
+    let displayAddress = ownerAddress;
+    try {
+      displayAddress = await getEnsName(ownerAddress);
+    } catch (error) {
+      console.error('Error getting ENS name:', error);
+    }
+    
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'white';
+    ctx.textBaseline = 'bottom';
+    console.log('Adding owner address:', displayAddress);
+    ctx.fillText(`${displayAddress}`, elevationWidth / 2, elevationHeight - 20);
+    
+    // Reset shadow
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+    
+  } catch (error) {
+    console.error('Error adding overlay elements:', error);
   }
   
   return canvas.toBuffer('image/png');

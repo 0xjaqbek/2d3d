@@ -5,7 +5,7 @@ import './FileUploader.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-function FileUploader({ onUploadStart, onUploadSuccess, onUploadError }) {
+function FileUploader({ onUploadStart, onUploadSuccess, onUploadError, tokenId, ownerAddress }) {
   const [isDragging, setIsDragging] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
 
@@ -39,6 +39,15 @@ function FileUploader({ onUploadStart, onUploadSuccess, onUploadError }) {
       
       const formData = new FormData();
       formData.append('image', selectedFile);
+      
+      // Add tokenId and ownerAddress to the form data if provided
+      if (tokenId) {
+        formData.append('tokenId', tokenId);
+      }
+      
+      if (ownerAddress) {
+        formData.append('ownerAddress', ownerAddress);
+      }
 
       console.log('Uploading file:', selectedFile.name, selectedFile.type, selectedFile.size);
       
