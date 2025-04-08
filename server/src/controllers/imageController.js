@@ -9,11 +9,18 @@ const processImageController = async (req, res) => {
 
     const buffer = req.file.buffer;
     
-    // Process the image and generate 3D model data
-    const modelData = await processImage(buffer);
+    // Process the image and generate the depth effect
+    const result = await processImage(buffer);
     
-    // Return the 3D model data
-    res.status(200).json({ modelData });
+    // If result is PNG data, send as image
+    if (result.format === 'png') {
+      res.set('Content-Type', 'image/png');
+      res.set('Content-Disposition', 'attachment; filename="depth-image.png"');
+      return res.send(result.data);
+    }
+    
+    // Otherwise return as JSON
+    res.status(200).json({ modelData: result });
   } catch (error) {
     console.error('Error processing image:', error);
     res.status(500).json({ error: error.message || 'Error processing image' });

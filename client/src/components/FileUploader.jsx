@@ -40,18 +40,35 @@ function FileUploader({ onUploadStart, onUploadSuccess, onUploadError }) {
       const formData = new FormData();
       formData.append('image', selectedFile);
 
+      console.log('Uploading file:', selectedFile.name, selectedFile.type, selectedFile.size);
+      
       const response = await fetch(`${API_URL}/api/upload`, {
         method: 'POST',
         body: formData,
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to upload image');
+        // Try to parse error as JSON
+        try {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to upload image');
+        } catch (e) {
+          throw new Error(`Server error: ${response.status}`);
+        }
       }
 
-      const data = await response.json();
-      onUploadSuccess(data);
+      // Check the content type to determine if it's an image or JSON
+      const contentType = response.headers.get('content-type');
+      
+      if (contentType && contentType.includes('image/')) {
+        // It's an image response, get as blob
+        const blob = await response.blob();
+        onUploadSuccess(blob);
+      } else {
+        // It's JSON data
+        const data = await response.json();
+        onUploadSuccess(data);
+      }
     } catch (error) {
       console.error('Upload error:', error);
       onUploadError(error);
@@ -92,7 +109,7 @@ function FileUploader({ onUploadStart, onUploadSuccess, onUploadError }) {
           className="upload-button" 
           onClick={handleUpload}
         >
-          Convert to 3D
+          Add Depth Effect
         </button>
       )}
     </div>

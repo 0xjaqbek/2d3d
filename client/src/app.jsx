@@ -1,16 +1,20 @@
 // client/src/App.jsx
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import FileUploader from './components/FileUploader';
-import ModelViewer from './components/ModelViewer';
 import './App.css';
 
 function App() {
-  const [modelData, setModelData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [resultImageUrl, setResultImageUrl] = useState(null);
+  const downloadLinkRef = useRef(null);
 
   const handleUploadSuccess = (data) => {
-    setModelData(data.modelData);
+    // For image responses, data will be a Blob
+    if (data instanceof Blob) {
+      const imageUrl = URL.createObjectURL(data);
+      setResultImageUrl(imageUrl);
+    }
     setLoading(false);
     setError(null);
   };
@@ -18,18 +22,26 @@ function App() {
   const handleUploadError = (err) => {
     setError(err.message || 'Failed to process image');
     setLoading(false);
+    setResultImageUrl(null);
   };
 
   const handleStartUpload = () => {
     setLoading(true);
     setError(null);
+    setResultImageUrl(null);
+  };
+
+  const handleDownload = () => {
+    if (resultImageUrl && downloadLinkRef.current) {
+      downloadLinkRef.current.click();
+    }
   };
 
   return (
     <div className="app">
       <header>
-        <h1>Pixel Art to 3D Model Converter</h1>
-        <p>Upload a pixel art image to convert it into a 3D model</p>
+        <h1>Pixel Art Depth Effect</h1>
+        <p>Upload a pixel art image to add a depth effect</p>
       </header>
 
       <main>
@@ -51,16 +63,30 @@ function App() {
           </div>
         )}
 
-        {modelData && (
+        {resultImageUrl && (
           <div className="result">
-            <ModelViewer modelData={modelData} />
+            <div className="image-result">
+              <h3>Result Image with Depth:</h3>
+              <img 
+                src={resultImageUrl} 
+                alt="Pixel art with depth effect" 
+                className="result-image"
+              />
+            </div>
             <div className="download-container">
-              <a 
+              <button 
                 className="download-button"
-                href={`data:text/plain;charset=utf-8,${encodeURIComponent(modelData.data)}`}
-                download="model.obj"
+                onClick={handleDownload}
               >
-                Download 3D Model (OBJ)
+                Download Image
+              </button>
+              <a 
+                ref={downloadLinkRef}
+                href={resultImageUrl}
+                download="depth-image.png"
+                style={{ display: 'none' }}
+              >
+                Download
               </a>
             </div>
           </div>
@@ -68,7 +94,7 @@ function App() {
       </main>
 
       <footer>
-        <p>&copy; 2025 Pixel Art to 3D Converter</p>
+        <p>&copy; 2025 Pixel Art Depth Effect</p>
       </footer>
     </div>
   );
