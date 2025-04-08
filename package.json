@@ -13,7 +13,7 @@
         "heroku-postbuild": "cd client && npm install && npm run build && cd ../server && npm install"
     },
     "engines": {
-        "node": ">=18.0.0"
+        "node": "20.x"
     },
     "dependencies": {
         "concurrently": "^8.2.2",
