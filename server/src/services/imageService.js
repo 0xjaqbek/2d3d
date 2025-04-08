@@ -11,20 +11,20 @@ const { ethers } = require('ethers');
 const getPixelsAsync = promisify((src, type, cb) => getPixels(src, type, cb));
 
 // Configuration parameters
-const LEVEL_0_HEIGHT = 6;     // Background level
-const LEVEL_1_HEIGHT = 11;     // Dark colors level
-const LEVEL_2_HEIGHT = 12;    // Bright colors level
-const LEVEL_3_HEIGHT = 12.5;    // Central dark elements (highest)
-const BRIGHTNESS_THRESHOLD = 0.5; // Threshold between dark and bright colors (0-1)
+const LEVEL_0_HEIGHT = 7;     // Background level
+const LEVEL_1_HEIGHT = 10;     // Dark colors level
+const LEVEL_2_HEIGHT = 13;    // Bright colors level
+const LEVEL_3_HEIGHT = 15;    // Central dark elements (highest)
+const BRIGHTNESS_THRESHOLD = 0.2; // Threshold between dark and bright colors (0-1)
 const SIDE_VIEW_ANGLE = 45;   // Angle in degrees for the side view (0-90)
 const EXTRUSION_DEPTH = 5;    // Scaling factor for extrusion
-const PADDING = 40;           // Padding around the image
+const PADDING = 60;           // Padding around the image
 
 // Center region (25%-75%)
-const CENTER_START_X = 0.25;  // Start of center region X (percentage of width)
-const CENTER_END_X = 0.75;    // End of center region X (percentage of width)
-const CENTER_START_Y = 0.25;  // Start of center region Y (percentage of height)
-const CENTER_END_Y = 0.75;    // End of center region Y (percentage of height)
+const CENTER_START_X = 0.33;  // Start of center region X (percentage of width)
+const CENTER_END_X = 0.66;    // End of center region X (percentage of width)
+const CENTER_START_Y = 0.40;  // Start of center region Y (percentage of height)
+const CENTER_END_Y = 0.80;    // End of center region Y (percentage of height)
 
 // Focus region (33%-66% width, 40%-80% height)
 const FOCUS_START_X = 0.33;   // Start of focus region X (percentage of width)
@@ -374,7 +374,7 @@ const renderElevationView = async (pixels, elevationMap, width, height, backgrou
     }
     
     // 2. Add NFT ID to top right corner
-    const fontSize = Math.round(elevationHeight * 0.06); // 4% of height for text size
+    const fontSize = Math.round(elevationHeight * 0.03); // 4% of height for text size
     ctx.font = `${fontSize}px sans-serif`;
     ctx.fillStyle = 'black';
     ctx.textAlign = 'right';

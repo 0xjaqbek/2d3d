@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { ethers } from 'ethers';
-import FileUploader from './components/FileUploader';
-import './app.css';
+import './App.css';
 
 // NFT Contract ABI (minimal required for getting token URI)
 const NFT_CONTRACT_ABI = [
@@ -135,23 +134,6 @@ function App() {
     }
   };
 
-  // Handle direct file upload
-  const handleUploadStart = () => {
-    setLoading(true);
-    setError(null);
-  };
-
-  const handleUploadSuccess = (blob) => {
-    setLoading(false);
-    const imageUrl = URL.createObjectURL(blob);
-    setResultImageUrl(imageUrl);
-  };
-
-  const handleUploadError = (error) => {
-    setLoading(false);
-    setError(error.message || 'Failed to upload and process image');
-  };
-
   const handleDownload = () => {
     if (resultImageUrl && downloadLinkRef.current) {
       downloadLinkRef.current.click();
@@ -166,108 +148,91 @@ function App() {
   return (
     <div className="app">
       <header>
-        <h1>Przemień thePolaka w 3D Polaka</h1>
-        <p>wpisz ID thePolaka</p>
+        <h1>thePolacy fanArt</h1>
+        <p>od jaqbka</p>
       </header>
 
       <main>
-        <div className="nft-retrieval">
-          <h2>NFT</h2>
+        <div className="nft-retrieval card">
+          <h2>Pobierz Dane</h2>
           <div className="token-input">
             <input 
               type="number" 
-              placeholder="Wpisz NFT Token ID" 
+              placeholder="Wpisz thePolacy NFT Token ID" 
               value={tokenId}
               onChange={(e) => setTokenId(e.target.value)}
             />
-            <button onClick={fetchNFTImage}>
-              Zczytaj Obarzek
+            <button 
+              className="primary-button"
+              onClick={fetchNFTImage}
+              disabled={loading}
+            >
+              {loading ? 'Procesuję...' : 'Wczytaj NFT'}
             </button>
           </div>
 
-          {/* Manual owner address input */}
-          <div className="owner-input">
-            {ownerAddress && (
-              <div className="owner-info">
-                <p>Właściciel: {ownerAddress}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Alternative direct file upload option */}
-          <div className="direct-upload">
-            <h3>Lub prześlij własny obraz</h3>
-            <FileUploader
-              onUploadStart={handleUploadStart}
-              onUploadSuccess={handleUploadSuccess}
-              onUploadError={handleUploadError}
-              tokenId={tokenId}
-              ownerAddress={getEffectiveAddress()}
-            />
-          </div>
-
-          {loading && (
-            <div className="loading">
-              <p>Ładowanie...</p>
-            </div>
-          )}
-
-          {error && (
-            <div className="error">
-              <p>{error}</p>
+          {ownerAddress && (
+            <div className="owner-info">
+              <p>Właściciel: {ownerAddress}</p>
             </div>
           )}
 
           {nftImageUrl && (
             <div className="nft-preview">
-              <h3>Obraz NFT</h3>
-              <img 
-                src={nftImageUrl} 
-                alt="Retrieved NFT" 
-                className="nft-image"
-              />
+              <div className="image-container">
+                <img 
+                  src={nftImageUrl} 
+                  alt="Retrieved NFT" 
+                  className="preview-image"
+                />
+              </div>
               <button 
-                className="convert-button"
+                className="primary-button"
                 onClick={handleConvertNFT}
+                disabled={loading}
               >
-                Konwertuj
+                {loading ? 'Procesuję...' : 'Dodaj Efekt'}
               </button>
             </div>
           )}
         </div>
 
+        {error && (
+          <div className="error-message">
+            <p>{error}</p>
+          </div>
+        )}
+
         {resultImageUrl && (
-          <div className="result">
-            <div className="image-result">
-              <h3>Wynik:</h3>
+          <div className="result card">
+            <h2>Proszę</h2>
+            <div className="image-container">
               <img 
                 src={resultImageUrl} 
                 alt="Pixel art with depth effect" 
                 className="result-image"
               />
             </div>
-            <div className="download-container">
-              <button 
-                className="download-button"
-                onClick={handleDownload}
-              >
-                Pobierz
-              </button>
-              <a 
-                ref={downloadLinkRef}
-                href={resultImageUrl}
-                download="depth-nft-image.png"
-                style={{ display: 'none' }}
-              >
-                Pobierz
-              </a>
-            </div>
+            <button 
+              className="download-button"
+              onClick={handleDownload}
+            >
+              Pobierz
+            </button>
+            <a 
+              ref={downloadLinkRef}
+              href={resultImageUrl}
+              download="depth-nft-image.png"
+              style={{ display: 'none' }}
+            >
+              Download
+            </a>
           </div>
         )}
       </main>
 
       <footer>
-        <p>&copy; 2025 thePolacy NFT FanPage by jaqbek.eth</p>
+        <p>&copy; 2025 thePolacy fanArtWeb3App.jaqbek</p>
       </footer>
     </div>
   );

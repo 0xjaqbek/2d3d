@@ -1,12 +1,17 @@
+/* Global styles - Dark theme */
 :root {
-  --primary-color: #4F46E5;
-  --secondary-color: #8B5CF6;
-  --background-color: #F9FAFB;
-  --card-color: #FFFFFF;
-  --text-color: #1F2937;
-  --border-color: #E5E7EB;
-  --error-color: #EF4444;
-  --success-color: #10B981;
+  --primary-color: #8b5cf6; /* Violet */
+  --primary-dark: #7c3aed;
+  --secondary-color: #6366f1; /* Indigo */
+  --background-color: #111827; /* Dark gray/blue */
+  --card-color: #1f2937; /* Slightly lighter gray */
+  --text-color: #f3f4f6; /* Light gray */
+  --text-secondary: #9ca3af; /* Medium gray */
+  --border-color: #374151; /* Darker gray for borders */
+  --error-color: #ef4444; /* Red */
+  --success-color: #10b981; /* Green */
+  --border-radius: 12px;
+  --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 }
 
 * {
@@ -15,10 +20,78 @@
   padding: 0;
 }
 
+html {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   background-color: var(--background-color);
   color: var(--text-color);
-  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* Responsive font sizes */
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 640px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* For accessibility */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Modern scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0f172a; /* Darker than background for contrast */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563; /* Medium gray */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-color);
+}
+
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* Button reset */
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+/* Focus style for inputs */
+input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
 }

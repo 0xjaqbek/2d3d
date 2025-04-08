@@ -33,16 +33,15 @@ const processImageController = async (req, res) => {
     if (result.format === 'png') {
       console.log('Sending PNG response');
       res.set('Content-Type', 'image/png');
-      res.set('Content-Disposition', 'attachment; filename="depth-image.png"');
+      res.set('Content-Disposition', 'attachment; filename="obraz-3d.png"');
       return res.send(result.data);
     }
     
     // Otherwise return as JSON
-    console.log('Sending JSON response');
     res.status(200).json({ modelData: result });
   } catch (error) {
-    console.error('Error processing image:', error);
-    res.status(500).json({ error: error.message || 'Error processing image' });
+    console.error('Błąd przetwarzania obrazu:', error);
+    res.status(500).json({ error: error.message || 'Błąd przetwarzania obrazu' });
   }
 };
 

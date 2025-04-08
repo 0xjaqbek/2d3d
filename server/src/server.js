@@ -24,7 +24,7 @@ const upload = multer({
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only PNG, JPEG, and GIF images are allowed.'));
+      cb(new Error('Nieprawidłowy typ pliku. Dozwolone są tylko obrazy PNG, JPEG i GIF.'));
     }
   }
 });
@@ -45,9 +45,8 @@ if (process.env.NODE_ENV === 'production') {
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
-    error: err.message || 'Something went wrong!',
+    error: err.message || 'Coś poszło nie tak!',
   });
 });
 
 module.exports = app;
-
