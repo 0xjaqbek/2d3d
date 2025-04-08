@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { ethers } from 'ethers';
-import './App.css';
+import './app.css';
 
 // NFT Contract ABI (minimal required for getting token URI)
 const NFT_CONTRACT_ABI = [
