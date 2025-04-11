@@ -14,8 +14,8 @@ const getPixelsAsync = promisify((src, type, cb) => getPixels(src, type, cb));
 const LEVEL_0_HEIGHT = 7;     // Background level
 const LEVEL_1_HEIGHT = 10;     // Dark colors level
 const LEVEL_2_HEIGHT = 13;    // Bright colors level
-const LEVEL_3_HEIGHT = 15;    // Central dark elements (highest)
-const BRIGHTNESS_THRESHOLD = 0.2; // Threshold between dark and bright colors (0-1)
+const LEVEL_3_HEIGHT = 14;    // Central dark elements (highest)
+const BRIGHTNESS_THRESHOLD = 0.6; // Threshold between dark and bright colors (0-1)
 const SIDE_VIEW_ANGLE = 45;   // Angle in degrees for the side view (0-90)
 const EXTRUSION_DEPTH = 5;    // Scaling factor for extrusion
 const PADDING = 60;           // Padding around the image
