@@ -1,23 +1,22 @@
-/* Global styles - Dark theme */
+/* Global styles with pixel art focus */
 :root {
-  --primary-color: #8b5cf6; /* Violet */
-  --primary-dark: #7c3aed;
-  --secondary-color: #6366f1; /* Indigo */
-  --background-color: #111827; /* Dark gray/blue */
-  --card-color: #1f2937; /* Slightly lighter gray */
-  --text-color: #f3f4f6; /* Light gray */
-  --text-secondary: #9ca3af; /* Medium gray */
-  --border-color: #374151; /* Darker gray for borders */
-  --error-color: #ef4444; /* Red */
-  --success-color: #10b981; /* Green */
-  --border-radius: 12px;
-  --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --red: #FF5555;
+  --orange: #FFAA00;
+  --yellow: #FFFF55;
+  --green: #55FF55;
+  --cyan: #55FFFF;
+  --blue: #5555FF;
+  --magenta: #FF55FF;
+  --dark-bg: #1a1a2e;
+  --card-bg: rgba(40, 40, 60, 0.8);
+  --border-color: #444466;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  image-rendering: pixelated;
 }
 
 html {
@@ -26,24 +25,13 @@ html {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+  font-family: 'Pixelify Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  background-color: var(--background-color);
-  color: var(--text-color);
+  background-color: var(--dark-bg);
+  color: #ffffff;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
-}
-
-/* Responsive font sizes */
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 640px) {
-  html {
-    font-size: 16px;
-  }
 }
 
 /* For accessibility */
@@ -56,29 +44,29 @@ html {
   }
 }
 
-/* Modern scrollbar */
+/* Pixel-styled scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0f172a; /* Darker than background for contrast */
+  background: #000000;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #4b5563; /* Medium gray */
-  border-radius: 4px;
+  background: var(--magenta);
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+  background-clip: padding-box;
+  image-rendering: pixelated;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-color);
-}
-
-/* Focus styles for accessibility */
-:focus-visible {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
+  background: var(--cyan);
 }
 
 /* Button reset */
@@ -89,9 +77,7 @@ button {
   font: inherit;
 }
 
-/* Focus style for inputs */
-input:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+/* Input styling */
+input {
+  font-family: 'Pixelify Sans', sans-serif;
 }

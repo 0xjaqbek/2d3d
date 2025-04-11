@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ethers } from 'ethers';
 import './app.css';
 
@@ -11,10 +11,21 @@ const NFT_CONTRACT_ABI = [
 // Contract address for the NFT collection
 const NFT_CONTRACT_ADDRESS = '0x99903e8eC87b9987bD6289DF8eff178d6E533561';
 
-// Ethereum mainnet RPC URL (using Infura - you can replace with Alchemy or other provider)
+// Ethereum mainnet RPC URL
 const ETHEREUM_RPC_URL = 'https://eth-mainnet.g.alchemy.com/v2/uH88xD8x-hsIQlZ8bgpyWjBfny9WUCfw';
 
-function App() {
+// Rainbow colors for UI elements
+const RAINBOW_COLORS = [
+  '#FF5555', // Red
+  '#FFAA00', // Orange
+  '#FFFF55', // Yellow  
+  '#55FF55', // Green
+  '#55FFFF', // Cyan
+  '#5555FF', // Blue
+  '#FF55FF', // Magenta
+];
+
+function PixelArtApp() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resultImageUrl, setResultImageUrl] = useState(null);
@@ -23,6 +34,19 @@ function App() {
   const [ownerAddress, setOwnerAddress] = useState('');
   const [manualAddress, setManualAddress] = useState('');
   const downloadLinkRef = useRef(null);
+  const [rainbowIndex, setRainbowIndex] = useState(0);
+
+  // Rainbow color cycling effect
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      setRainbowIndex((prev) => (prev + 1) % RAINBOW_COLORS.length);
+    }, 2000);
+    
+    return () => clearInterval(intervalId);
+  }, []);
+  
+  // Get current rainbow color
+  const getCurrentColor = () => RAINBOW_COLORS[rainbowIndex];
 
   // Function to fetch NFT image URL using public provider
   const fetchNFTImage = async () => {
@@ -47,7 +71,7 @@ function App() {
       // Validate token ID
       const tokenIdNum = parseInt(tokenId, 10);
       if (isNaN(tokenIdNum) || tokenIdNum < 0) {
-        throw new Error('Invalid Token ID');
+        throw new Error('Nieprawidłowy Token ID');
       }
 
       // Fetch token URI
@@ -64,7 +88,7 @@ function App() {
       const response = await fetch(imageUrl);
       
       if (!response.ok) {
-        throw new Error('Failed to fetch NFT image');
+        throw new Error('Nie udało się pobrać obrazu NFT');
       }
 
       // For IPFS metadata JSON, we might need to parse JSON and get image
@@ -76,8 +100,8 @@ function App() {
       setNftImageUrl(actualImageUrl);
       setLoading(false);
     } catch (err) {
-      console.error('Error fetching NFT:', err);
-      setError(err.message || 'Failed to fetch NFT');
+      console.error('Błąd pobierania NFT:', err);
+      setError(err.message || 'Nie udało się pobrać NFT');
       setLoading(false);
     }
   };
@@ -90,8 +114,8 @@ function App() {
       setLoading(true);
       setError(null);
   
-      console.log('Converting NFT with token ID:', tokenId);
-      console.log('Owner address:', ownerAddress || manualAddress || 'Not specified');
+      console.log('Konwertowanie NFT z tokenID:', tokenId);
+      console.log('Adres właściciela:', ownerAddress || manualAddress || 'Nie określono');
   
       // Fetch image blob
       const response = await fetch(nftImageUrl);
@@ -103,12 +127,12 @@ function App() {
       
       // Add tokenId and ownerAddress if available
       if (tokenId) {
-        console.log('Adding token ID to form data:', tokenId);
+        console.log('Dodawanie token ID do formularza:', tokenId);
         formData.append('tokenId', tokenId);
       }
       
       const effectiveAddress = ownerAddress || manualAddress || '0x0000000000000000000000000000000000000000';
-      console.log('Adding owner address to form data:', effectiveAddress);
+      console.log('Dodawanie adresu właściciela do formularza:', effectiveAddress);
       formData.append('ownerAddress', effectiveAddress);
   
       // Upload to server for processing
@@ -118,7 +142,7 @@ function App() {
       });
   
       if (!processResponse.ok) {
-        throw new Error('Failed to process image');
+        throw new Error('Nie udało się przetworzyć obrazu');
       }
   
       // Create blob URL for the result
@@ -128,8 +152,8 @@ function App() {
       setResultImageUrl(imageUrl);
       setLoading(false);
     } catch (err) {
-      console.error('Conversion error:', err);
-      setError(err.message || 'Failed to convert image');
+      console.error('Błąd konwersji:', err);
+      setError(err.message || 'Nie udało się przekonwertować obrazu');
       setLoading(false);
     }
   };
@@ -140,49 +164,60 @@ function App() {
     }
   };
 
-  // Get effective address for the form (either from NFT lookup or manual entry)
-  const getEffectiveAddress = () => {
-    return ownerAddress || manualAddress || '';
+  // Get border style with random pixel pattern
+  const getPixelBorder = () => {
+    return {
+      borderImageSlice: '4 4 4 4',
+      borderImageWidth: '4px 4px 4px 4px',
+      borderImageOutset: '0px 0px 0px 0px',
+      borderImageRepeat: 'repeat repeat',
+      borderImageSource: `url("data:image/svg+xml,%3Csvg width='8' height='8' viewBox='0 0 8 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h1v1H0V0zm2 0h1v1H2V0zM1 1h1v1H1V1zm2 0h1v1H3V1zM0 2h1v1H0V2zm2 0h1v1H2V2zM1 3h1v1H1V3zm2 0h1v1H3V3z' fill='${getCurrentColor().replace('#', '%23')}'/%3E%3C/svg%3E")`,
+      borderWidth: '4px',
+      borderStyle: 'solid',
+      borderColor: 'transparent'
+    };
   };
 
   return (
-    <div className="app">
+    <div className="pixel-app">
       <header>
-        <h1>thePolacy fanArt</h1>
-        <p>od jaqbka</p>
+        <img src="https://www.thepolacy.pl/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Flogo.9ed90224.png&w=256&q=75" alt="thePolacy" className="logo" />
+        <p className="tagline">FanArt</p>
       </header>
 
       <main>
-        <div className="nft-retrieval card">
-          <h2>Pobierz Dane</h2>
+        <div className="nft-retrieval card" style={getPixelBorder()}>
+          <h2>Pobierz Dane NFT</h2>
           <div className="token-input">
             <input 
               type="number" 
               placeholder="Wpisz thePolacy NFT Token ID" 
               value={tokenId}
               onChange={(e) => setTokenId(e.target.value)}
+              style={getPixelBorder()}
             />
             <button 
               className="primary-button"
               onClick={fetchNFTImage}
               disabled={loading}
+              style={getPixelBorder()}
             >
-              {loading ? 'Procesuję...' : 'Wczytaj NFT'}
+              {loading ? 'Ładowanie...' : 'Wczytaj NFT'}
             </button>
           </div>
 
           {ownerAddress && (
-            <div className="owner-info">
+            <div className="owner-info" style={getPixelBorder()}>
               <p>Właściciel: {ownerAddress}</p>
             </div>
           )}
 
           {nftImageUrl && (
             <div className="nft-preview">
-              <div className="image-container">
+              <div className="image-container" style={getPixelBorder()}>
                 <img 
                   src={nftImageUrl} 
-                  alt="Retrieved NFT" 
+                  alt="Pobrany NFT" 
                   className="preview-image"
                 />
               </div>
@@ -190,52 +225,54 @@ function App() {
                 className="primary-button"
                 onClick={handleConvertNFT}
                 disabled={loading}
+                style={getPixelBorder()}
               >
-                {loading ? 'Procesuję...' : 'Dodaj Efekt'}
+                {loading ? 'Przetwarzanie...' : 'Dodaj Efekt 3D'}
               </button>
             </div>
           )}
         </div>
 
         {error && (
-          <div className="error-message">
+          <div className="error-message" style={getPixelBorder()}>
             <p>{error}</p>
           </div>
         )}
 
         {resultImageUrl && (
-          <div className="result card">
-            <h2>Proszę</h2>
-            <div className="image-container">
+          <div className="result card" style={getPixelBorder()}>
+            <h2>Oto Twoja Grafika 3D</h2>
+            <div className="image-container" style={getPixelBorder()}>
               <img 
                 src={resultImageUrl} 
-                alt="Pixel art with depth effect" 
+                alt="Pixel art z efektem głębi" 
                 className="result-image"
               />
             </div>
             <button 
               className="download-button"
               onClick={handleDownload}
+              style={getPixelBorder()}
             >
               Pobierz
             </button>
             <a 
               ref={downloadLinkRef}
               href={resultImageUrl}
-              download="depth-nft-image.png"
+              download="pixel-art-3d.png"
               style={{ display: 'none' }}
             >
-              Download
+              Pobierz
             </a>
           </div>
         )}
       </main>
 
       <footer>
-        <p>&copy; 2025 thePolacy fanArtWeb3App.jaqbek</p>
+        <p>© 2025 thePolacy fanArtWeb3App by jaqbek</p>
       </footer>
     </div>
   );
 }
 
-export default App;
+export default PixelArtApp;
